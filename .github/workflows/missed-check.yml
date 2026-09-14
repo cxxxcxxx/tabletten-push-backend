@@ -1,0 +1,25 @@
+name: Nicht abgehakt - Check
+
+on:
+  schedule:
+    # 0 20 * * * (UTC) -> ca. 21:00 (Winter) / 22:00 (Sommer) Ortszeit.
+    # Zeitpunkt, ab dem du benachrichtigt werden willst, falls sie noch
+    # nicht komplett abgehakt hat. Stunde hier bei Bedarf anpassen.
+    - cron: '0 20 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install firebase-admin
+      - run: node scripts/check-missed.js
+        env:
+          ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
+          ONESIGNAL_REST_API_KEY: ${{ secrets.ONESIGNAL_REST_API_KEY }}
+          OWNER_UID: ${{ secrets.OWNER_UID }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}

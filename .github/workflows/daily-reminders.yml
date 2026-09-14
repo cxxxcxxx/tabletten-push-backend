@@ -1,0 +1,28 @@
+name: Tägliche Tabletten-Erinnerung
+
+on:
+  schedule:
+    # Ziel-Ortszeiten (Deutschland, Winterzeit/CET = UTC+1): 6:00, 7:00, 11:00, 14:30, 19:30
+    # Solange noch Sommerzeit (CEST, UTC+2) gilt -- also bis Ende Oktober --
+    # kommen die Pushes ca. 1 Stunde SPÄTER an als hier angegeben (z.B. 6:00 -> 7:00).
+    # Nach der Zeitumstellung im Herbst passt es automatisch wieder genau.
+    - cron: '0 5 * * *'    # Ziel: 6:00
+    - cron: '0 6 * * *'    # Ziel: 7:00
+    - cron: '0 10 * * *'   # Ziel: 11:00
+    - cron: '30 13 * * *'  # Ziel: 14:30
+    - cron: '30 18 * * *'  # Ziel: 19:30
+  workflow_dispatch: {}   # erlaubt manuelles Auslösen zum Testen (Tab "Actions" -> "Run workflow")
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/send-reminder.js
+        env:
+          ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
+          ONESIGNAL_REST_API_KEY: ${{ secrets.ONESIGNAL_REST_API_KEY }}
+          FRIEND_UID: ${{ secrets.FRIEND_UID }}
