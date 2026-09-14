@@ -11,7 +11,19 @@ if (!admin.apps.length) {
   });
 }
 
+const ALLOWED_ORIGIN = 'https://tablettentracker.web.app';
+
 export default async function handler(req, res) {
+  // CORS: erlaubt eurer Firebase-Seite, diese Funktion vom Browser aus aufzurufen.
+  res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+
+  // Preflight-Anfrage des Browsers: nur die Header bestätigen, kein Inhalt nötig.
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
